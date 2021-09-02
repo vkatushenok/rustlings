@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 // The From trait is used for value-to-value conversions.
 // If From is implemented correctly for a type, the Into trait should work conversely.
 // You can read more about it at https://doc.rust-lang.org/std/convert/trait.From.html
@@ -33,10 +35,26 @@ impl Default for Person {
 // If while parsing the age, something goes wrong, then return the default of Person
 // Otherwise, then return an instantiated Person object with the results
 
-// I AM NOT DONE
-
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        if s.is_empty() {
+            Person::default()
+        } else {
+            let mut parts: Vec<&str> = s.split(',').collect();
+            let age = parts.pop().and_then(|age| usize::from_str(age).ok());
+            let name = parts.pop().and_then(|name| {
+                if !name.is_empty() {
+                    Some(name.to_string())
+                } else {
+                    None
+                }
+            });
+            if let (Some(age), Some(name)) = (age, name) {
+                Person { age, name }
+            } else {
+                Person::default()
+            }
+        }
     }
 }
 
